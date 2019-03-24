@@ -63,3 +63,33 @@ Without an Internet Gateway, a VCN is isolated from the internet even if it has 
 A route table is a set of routing instuctions for network traffic in a VCN.
 - Each subnet has a single route table
 - Being attahed to a subnet makes the route table an AD scoped element.
+- A route rule is used when the destination address is outside the VCN's CIDR.
+- No route rules are requrired when routing traffic within the VCN itself.
+- Route rules are required when using gateways or connections
+
+### NAT Gateway
+
+Its used for connecting a private network/subnet to the internet.
+- The hosts in the subnet do not need to assigned a public IP address.
+- Traffic can go out of the subnet to the internet and return, 
+    - However nothing from the internet can connect to any thing on the private subnet.
+- There can be multiple NAT gateways per VCN (unlike a single Internet Gateway per VCN) 
+    - However a given subnet in the VCN can only route traffic to a single NAT gateway.
+
+### Service Gateway
+
+Its a special gateway to route traffic from a subnet to **public OCI services**.
+- There is one service gateway per VCN.
+- Although the service is public, since its on OCI itself, a Service Gateway routes the traffic internally.
+- Traffic over the service gateway does not traverse the internet.
+- Object storage is the only service supported now.
+- Route table needs to be updated, but instead of a destination CIDR block, you specify the  destination service.
+
+### Dynamic Routing Gateway
+
+A DRG is used to connect your VCN to your OnPrem network. 
+- Its a standalone ibject, but has a 1:1 relationship with a VCN
+- Connects traffic from a private subnet to destinations that are in the a remote network, that are not internet.
+- The traffic is entirely private, but its crossing the boundary of the VCN
+- Connectivity is provided by either and IPSec VPN or FastConnect(dedicated channel)
+- Using a DRG requires the subnet to have an entry in the route table.  
