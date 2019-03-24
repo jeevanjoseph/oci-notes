@@ -13,22 +13,21 @@ Recollect the basics :
     - Since thats obviously inconvinient, we represent each of those 8-bit segments (octets) in decimal.
     - 00000000 => 0 and 11111111 => 255 in decimal form. 
     - So in decimal form we can represent the same range as 0.0.0.0 - 255.255.255.255
-CIDR Notation
-    - CIDR represents chunk of contigous IP addresses => CIDR Block
-    - The notation simply denotes an IP addres with the number of bits that are fixed. 
-    - The remaining number of bits gives the possibilities for IP addresses in that block = the size of the CIDR block
-        - 10.0.0.0/30 => Remember that there are only 32 bits in an IPv4 address. 
-            - This CIDR says 30 bits are fixed, so only 2 bits can change => we have 2^2 = 4 possible addresses
-            - They range from 10.0.0.0 - 10.0.0.3
-            - So a CIDR Block 10.0.0.4/30 can represent another non-overlapping CIDR Block - 10.0.0.4-10.0.0.7 (4 IPs)
-    - So a 10.0.0.0/24 CIDR block has 24 bits reserved, and we have 32-24= 8 bits available to us for allocation
-        - This gives us 2^8 = 256 addresses, from  10.0.0.0 - 10.0.0.255
-    - Another example 10.0.0.0/20
-        - 20 bits are blocked, leaving 12 bits for the addresses, or 2^12 = 4096 addresses.
-        - Of the 20 bits blocked => first two octets, and the first 4 bits of the 3rd octet, leaving 4 bits in the 3rd octect
-            - **00010001.00000000.0000**_0000.00000000_
-        - The third octect can range from 0000 - 1111 => 0-15
-        - So the 4096 addresses will be 10.0.0.255, 10.0.1.255, .... 10.0.15.255
+- CIDR represents chunk of contigous IP addresses => CIDR Block
+- The notation simply denotes an IP addres with the number of bits that are fixed. 
+- The remaining number of bits gives the possibilities for IP addresses in that block = the size of the CIDR block
+    - 10.0.0.0/30 => Remember that there are only 32 bits in an IPv4 address. 
+        - This CIDR says 30 bits are fixed, so only 2 bits can change => we have 2<sup>2</sup> = 4 possible addresses
+        - They range from 10.0.0.0 - 10.0.0.3
+        - So a CIDR Block 10.0.0.4/30 can represent another non-overlapping CIDR Block - 10.0.0.4-10.0.0.7 (4 IPs)
+- So a 10.0.0.0/24 CIDR block has 24 bits reserved, and we have 32-24= 8 bits available to us for allocation
+    - This gives us 2<sup>8</sup> = 256 addresses, from  10.0.0.0 - 10.0.0.255
+- Another example 10.0.0.0/20
+    - 20 bits are blocked, leaving 12 bits for the addresses, or 2<sup>12</sup> = 4096 addresses.
+    - Of the 20 bits blocked => first two octets, and the first 4 bits of the 3rd octet, leaving 4 bits in the 3rd octect
+        - **00010001.00000000.0000**_0000.00000000_
+    - The third octect can range from 0000 - 1111 => 0-15
+    - So the 4096 addresses will be 10.0.0.255, 10.0.1.255, .... 10.0.15.255
 
 ### VCN
 
