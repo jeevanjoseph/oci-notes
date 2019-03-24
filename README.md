@@ -93,3 +93,45 @@ A DRG is used to connect your VCN to your OnPrem network.
 - The traffic is entirely private, but its crossing the boundary of the VCN
 - Connectivity is provided by either and IPSec VPN or FastConnect(dedicated channel)
 - Using a DRG requires the subnet to have an entry in the route table.  
+
+### Local Peering Gateway.
+
+This is a mechanism to connect two separate VCNs in the same region. 
+You may have different VCNs in the same region and if you use an LPG to establish connectivity between.
+Remember that VCNs are regional in scope, so "Local" in this context means that its local within the same region.
+
+- LPG is defined for a specific VCN.
+- To connect two different VCNs, 
+    - Each VCN must have an LPG.
+    - On each VCN, a route rule is defined such that 
+        - The route destination is the VCN's own LPG
+        - The destination CIDR is the CIDR of the other VCN.
+        - It effectively reads that for addresses in the destination CIDR, use this LPG.
+    - The LPGs are then connected to each other.
+    - For a VCN to talk to 2 other VCNs in the same region, different LPG pairs are used.
+    - VCNs in a peering relationship cannot have overlapping CIDRs
+        - The route table rules do not apply to desitnations within the VCN.
+        - Overlapping addresses will not resolve to the remote destinations
+
+### Remote Peering 
+
+This is similar to local VCN peering, however applied to VCNs in different regions.
+The main purpose for this is to utilize the private communication fabric offered by the 
+Oracle backbone network, instead of sending traffic over the internet. 
+
+Unlike the LPG case, there is an additional entity at play here - the Remote Peering Connection
+
+- Connects two VCNs in OCI that are in different regions.
+- Traffic is private and goes over the Oracle channel between the regions
+- There is no _Remote Peering Gateway_, a pair of DRGs are used.
+- The DRGs are connected to each other using a **Remote Peering Connection**
+-
+
+
+## Questions
+- Remote Peering along with On Prem Connectivity
+    - Since a VCN can be connected to a single DRG at a time and a DRG can be conneced to a single VCN at a time, How do you connect a VCN to an OnPrem network as well as a different Region ?
+        - Potential answer : use a DRG for either one (say, Remote peering). 
+        - Then create a separate VCN in the same region  and use that to do the other (Onprem connection)
+        - Now do local peering between the VCNs in the same region.
+        - The VCN might need to have an overlapping subnet with the Customer Premises Equipment (CPE) and a route rule that sends every thing to the CPE.  
