@@ -49,7 +49,8 @@ They divide the IP namespace of the VCN in to distinct groups that can be manage
 - As subnets are AD specific, the VCN CIDR block is divided in to multiple subnets at the AD level.
     - The subnet address range should be within the VCN block
     - Subnet addressing ranges cannot overlap
-    - 
+    - Subnet can have one Route table and upto 5 Security Lists
+
 ### Internet Gateway
 
 They provide a mechanism for public internet traffic to enter/exit a VCN. 
@@ -125,8 +126,43 @@ Unlike the LPG case, there is an additional entity at play here - the Remote Pee
 - Traffic is private and goes over the Oracle channel between the regions
 - There is no _Remote Peering Gateway_, a pair of DRGs are used.
 - The DRGs are connected to each other using a **Remote Peering Connection**
--
 
+### Transit Routing
+
+This is a case where the CPE needs to connect to multiple VCNs in the same region. 
+- Uses a single FastConnect or IPSec VPN to connect your on-premises network with multiple VCNs in the same region, in a hub-and-spoke layout
+- The VCNs must be in the same region but can be in different tenancies. 
+- The CIDR blocks of the various subnets of interest in the on-premises network and VCNs must not overlap.
+- The _hub_ uses a DRG to communicate with the CPE, and LPGs to communicate with the _spoke_ VCNs
+- The _hub_ direct traffic using a route table on the **DRG attachment** (usually route tables are on the subnets)
+- Note that a route table associated with a DRG attachment can contain only rules that use a local peering gateway (LPG) on the attached VCN as the target.
+
+### Security Lists
+
+- These are objects that are attached to subnets. When attached, they control the traffic that can flow in and out of all elements in the subnet.
+- Seclists are applied whether an instance is communicating with another host on the same VCN or not.
+- Rules can be stateful or stateless. Default is __stateful__
+- Stateful rules use connection tracking. 
+    - this means that if there is an ingress rule (allow any connection to :80)
+    - then an egress rule is not required. OCI tracks the source IP and port and alows the response to go out. 
+- Stateless rules do not use connection tracking. The fact that the rule is stateless means that connection tracking is disabled.
+    - Stateless rules require that a corresponding egress rule be creatd or response traffic will be blocked.
+    - Better performance than stateful rules.
+
+### Default Components for the VCN
+
+VCN comes with some default objects that cannot be deleted, but can be edited.
+- Default Route Table
+- Default Security List
+- Default DHCP options
+- The default components can be edited but cannot be deleted.
+
+### Internal DNS
+
+There is an internal DNS within OCI that resolves the FQDNs and other domain names. You can customize this using the __DHCP Options__ object
+- DNS Labels can be set for the various network elements forming the FQDN for an instance
+    - <hostname>.<subnet_dnslabel>.<vcn_dnslabel>.oraclevcn.com
+    - These FQDNs __always__ resolve to the private IP address even if the instnace has a Public IP address
 
 ## Questions
 - Remote Peering along with On Prem Connectivity
