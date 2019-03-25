@@ -39,6 +39,37 @@ VCNs represent distinct networks, in the tenancy with their own CIDR blocks.
     - OCI in addition to this reserves one more, the second IP in the block.
     - So a /30 block will yeild **one** usable address, instead of 4. 
 
+#### Hands on with VCN
+
+To create a VCN, the CIDR Block and the comaprtment ID are mandatory.
+```
+oci network vcn create \
+--cidr-block 192.168.0.0/24 \
+--compartment-id <ocid> \
+--dns-label certprep
+```
+The newly created VCN will have the default resources created and the command returns the OCIDs for the resources created.
+```json
+{
+  "data": {
+    "cidr-block": "192.168.0.0/24",
+    "compartment-id": "ocid1.compartment.oc1..aaaaaaaa4vxl6yyvfcumwutejntiu3tzcwacbpgdqndh3kct5i65ahvz7oma",
+    "default-dhcp-options-id": "ocid1.dhcpoptions.oc1.phx.aaaaaaaap46hsz4xtxpjl7dktkuvdljbmzo3u6bcuvebmtvafh3imffwxbga",
+    "default-route-table-id": "ocid1.routetable.oc1.phx.aaaaaaaac4v7lt47xqp63fht7jjd5ima7jeomafsek4p4rhjdhbkomrlpalq",
+    "default-security-list-id": "ocid1.securitylist.oc1.phx.aaaaaaaaj6temm3uifjmy2r6l5n7lkr36bjvxrep7lulbj5grn4odnlxxgtq",
+    "defined-tags": {},
+    "display-name": "vcn20190325075458",
+    "dns-label": "certprep",
+    "freeform-tags": {},
+    "id": "ocid1.vcn.oc1.phx.aaaaaaaao5waj4btfvwlvx6pfhb4ntvydt6msacvoxt2dz5uy4426kimjqaa",
+    "lifecycle-state": "AVAILABLE",
+    "time-created": "2019-03-25T07:54:58.315000+00:00",
+    "vcn-domain-name": "certprep.oraclevcn.com"
+  },
+  "etag": "4f09a296"
+}
+```
+
 ### Subnets
 
 Subnets in an VCN is the logical equivalent of an actual subnet. 
@@ -49,6 +80,36 @@ They divide the IP namespace of the VCN in to distinct groups that can be manage
     - The subnet address range should be within the VCN block
     - Subnet addressing ranges cannot overlap
     - Subnet can have one Route table and upto 5 Security Lists
+
+Quick creating a subnet with the console will create the subnet and the default resources like the seclist, route table and dhcp option,
+and additionally will create 3 subnets distributed in the 3 ADs, and choose the CIDR blocks for the VCN (will be a /16 network) as well as the subnets.
+
+#### Private IP
+
+Every instance has a private IP associated with it. 
+- A private IP can optionally have a public IP associated with it if its in a public subnet.
+- Every Instance has at least 2 vNICs. Can have more.
+    - The vNICs on an instance could be connected to multiple subnets or even multiple VCNs.
+    - Each vNIC has a primary private IP address, as well as upto 31 secondary private IP addresses. total=32
+    - The primary private IP address is assigned at boot time and the secondary IP addresses are only assigned after launch.
+    - A secondary private IP can be moved from one vNIC to antother
+        - Helpful in failover. If one instance fails, the IP can be moved to another identical instance.
+
+#### Public IP
+
+Public IPs are reachable from the internet and can be assigned to elements in a public subnet.
+- Public IPs are attaced to a Private IP - meaning that for an element to use a Public IP it should already have a Private IP.
+- Resources can be assigned multiple Public IPs corresponding to Private IPs and also across vVNICs attached to the element
+- Public IPs are assigned to 
+    - Instances
+    - NAT gateway - You cannot choose or edit the IP allocated
+    - Internet Gateway - Cannot be changed or edited.
+    - DRG - Cannot edit the IP address allocated.
+    - ATP & AWD - Same - there are Oracle provided and managed, customer cannot edit or manage these IPs.
+    - OKE - Same - The IP addresses are  managed by Oracle and cannot be edited by the user.
+- Public IPs are __Ephemeral__ or __Reserved__
+- No charges for using a Public IP addresses even they are not attached to any isntance.
+
 
 ### Internet Gateway
 
