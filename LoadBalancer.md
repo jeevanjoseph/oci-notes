@@ -36,11 +36,18 @@ OCI load balancers can do health checks on "backend services" and use a variety 
         * whre the region has a single AD, no failover.
       * If the LB is created in an AD specific subnet, then there is no failover
 * Creation & Management
-  * All LBs have a backend set made up of
-    * A set of servers to which traffic is to be forwarded
-      * The servers can be anywhere as long as there is a network path and the subnet security lists allow traffic to come in.
-    * health check policy
-    * loadbalancing policy
+  * All LBs have a 
+    * __Backend Set__ - set of servers to which traffic is to be forwarded
+      * The servers can be in multiple ADs or anywhere as long as there is a network path and the subnet security lists allow traffic to come in.
+    * __Health Check__ policy
+      * Both TCP and HTTP health checks are available.
+      * Health can be __OK, Warning, Critical, Unknown__
+      * Health checks are done at 3 min interval. Cannot be finer.
+    * __Load Balancing__ policy
+      * Round Robin
+      * IP Hash - uses the source IP address as a hash key
+      * Least Connections 
+      * Policies are applicable only to TCP and __non-sticky__ HTTP traffic. If __session persistence is enabled__, then cookie info is used for routing.
     * SSL config (opt)
     * Session persistence config (opt)
 * Limitations
@@ -48,7 +55,7 @@ OCI load balancers can do health checks on "backend services" and use a variety 
   * Cannot convert an AD specific LB (created with AD specific Subnets) to a regional LB
   * Each LB has:
     * One IP address
-    * 16 backend sets
     * 512 backend servers per backend set
     * 1024 backend servers total
-    * 16 listeners
+    * 16 listeners (each LB ip can listen on 16 ports)
+      * Each listener port points to one backend set =  * 16 backend sets.
