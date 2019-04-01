@@ -76,7 +76,7 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
   * Cloning is disk to disk deep copy. The object storage is not involved.
   * Can be done only within an AD since block volumes are AD specific.
   * Clones become ready for use (attachment to an instance), but copy is async
-  * Backup and clone cannot run at the same time (request will be rejected, not queued)
+  * Backup and clone cannot run at the same time (request will be rejected, not queued~~~)
 
 #### Resizing Volumes
 
