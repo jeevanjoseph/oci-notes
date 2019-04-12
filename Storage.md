@@ -125,8 +125,13 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
   * copies one object at a time from one bucket to another.
     * buckets can be in different namespaces(tenancy) or compartments or regions
     * requires an IAM policy that grants the __manage__ privilege to the Object Storage service in the target location.
-    *  allow service objectstorage-<region_name> to manage object-family in compartment <compartment_name>
-    *  Needs policy in both source and target regions.
+    * allow service objectstorage-<region_name> to manage object-family in compartment <compartment_name>
+    * Needs policy in both source and target regions.
+    * Copy cannot use an archive bucket as _SOURCE_. An archived object needs to be restored to the normal bucket before it can be copied to another bucket.
+    * Copy _CAN_ specify an archive bucket as _TARGET_. The object is immediately archived.
+    * The target bucket must exist. Buckets are not created by the copy operation
+    * If the source object is changed during a copy, the copy fails.
+    * Only one object can be copied at a time
 * __Multi-Part Uploads__
   * useful for large files. Max object size is 10TB.
   * Parts can be from 10MB to 50GB per part.
