@@ -62,20 +62,22 @@ Various shapes available across multiple platforms.
 ### Boot Volumes
 
 These are block storage volumes provisioned and attached to an instance at the time of instance creation.
+
 * They hold the OS for the instance.
 * Encrypted by default, like any other block volume.
 * They can be deleted when the instance is terminated.
 * Can be used to scale an instance
-    * Boot volume from, say, a VM is detached after stopping the VM
-    * A new BM instance is created, specifying the detached boot volume.
-    * You now effectively have a scaled up (VM->BM) instance. 
-    * Everything on the older instance is still available on the new instance as well.
+  * Boot volume from, say, a VM is detached after stopping the VM
+  * A new BM instance is created, specifying the detached boot volume.
+  * You now effectively have a scaled up (VM->BM) instance. 
+  * Everything on the older instance is still available on the new instance as well.
 * 46/50GB is default for Linux, and 250 GB is the default for Windows, and 32TB is the max
+  * A custom boot volume also requires the OS partition to be enlarged, for the OS to use it.
 * They can be backed up and cloned. and there is no downtime when backing up or cloning.
 * The backups and clones reside in object storage and the customer pays for the storage.
 * The backups are crash consitent (all files are backed up at the same time)
 * Backups can be incremental or full.
-* Backups can be in a separate compartment from the boot volume. 
+* Backups can be in a separate compartment from the boot volume.
 * They cannot be detached from an instance when they are running.
 
 ### Instance Metadata
@@ -84,26 +86,27 @@ The instance metadata includes details like the
 
 ### Instance Configuration and Pools
  
- An instance configuration encapsulates the configuration for an instance and new instances can be launched from this config and managed as a pool.
- * The config includes the base image, shape, metadata, network config and block volume attachments.
- * An instance pool can be creatd with the instance config 
- * The pool can then be scaled.
-    * If you stop an instance of a pool of size 5, the instance is restarted so that there are still 5 instances in the pool.
- * When a pool is deleted, all resources - instances, boot volumes, and attached block volumes are deleted.
- * An instance config used by at least one pool cannot be deleted.
- * If an instance config is updated, then existing instances do not change.
-    * New instances will have the updated config
-    * If existing instances are terminated, then new ones are created with updated config to maintain the instance count of the pool
- * The instance config and the pool need to be in the same conpartment
- * If a pool is scaled down, then the oldest instance is terminated first.
- 
- ### Autoscaling
+An instance configuration encapsulates the configuration for an instance and new instances can be launched from this config and managed as a pool.
+
+* The config includes the base image, shape, metadata, network config and block volume attachments.
+* An instance pool can be creatd with the instance config 
+* The pool can then be scaled.
+  * If you stop an instance of a pool of size 5, the instance is restarted so that there are still 5 instances in the pool.
+* When a pool is deleted, all resources - instances, boot volumes, and attached block volumes are deleted.
+* An instance config used by at least one pool cannot be deleted.
+* If an instance config is updated, then existing instances do not change.
+  * New instances will have the updated config
+  * If existing instances are terminated, then new ones are created with updated config to maintain the instance count of the pool
+* The instance config and the pool need to be in the same conpartment
+* If a pool is scaled down, then the oldest instance is terminated first.
+
+### Autoscaling
 
  Autoscaling uses an instance pool, and scales the pool out or in based on some performance metric.
 
- * Relies on the metrics gathered by the monitoring service.
- * Metrics are aggregated to 1min windows and averaged across the instances in the pool
- * When 3 consecutive evaluations hit the threshold, an auto scaling event is triggered.
- * There is a cool down period after an autoscaling event. 
-    * Metrics are evaluated during the cooldown as well.
-    * After cool down the instance pool is adjusted again if needed. 
+* Relies on the metrics gathered by the monitoring service.
+* Metrics are aggregated to 1min windows and averaged across the instances in the pool
+* When 3 consecutive evaluations hit the threshold, an auto scaling event is triggered.
+* There is a cool down period after an autoscaling event. 
+  * Metrics are evaluated during the cooldown as well.
+  * After cool down the instance pool is adjusted again if needed. 
