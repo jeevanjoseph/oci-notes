@@ -95,9 +95,13 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
   * Petabytes+ Max object size is 10TB.
   * Unlimited Storage, Unstuctured data (Content Repository, Archives, IOT data, HDFS Connector )
   * REST API to read and write objects (vs. native iSCSI for block storage)
-* Storage classes for __hot__ (Normal) and __cold__ (Archive) data.
+* Storage classes for __hot__ (Standard) and __cold__ (Archive) data.
   * chosen when a bucket is created, and cannot be changed later.
-  * 
+  * Objects in archive tier need to be restored to standard tier to copy or download them
+    * Once Archived, the restore is temporary and the object returns to archive tier after a time limit
+    * Archived objects can be listed, deleted and renamed in exactly the same way as non-archived objects
+    * A request to restore an already restored object will do nothing. It does not reset the time window when the object returns to Archive.
+    * Calls to an Archive bucket are not metered.
 * Supports private access from within OCI using service gateways (clients in oci need not have NAT gateways or public subnets)
 * A __Namespace__ is allocated to the tenancy at tenancy creation.
   * Namespaces are not editable
@@ -120,7 +124,6 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
     * /n/<object_storage_namespace>/b/<bucket>/o/level1/prefix_object1
     * /n/<object_storage_namespace>/b/<bucket>/o/level1/prefix_object2
     * Bulk operations can be performed based on the prefixes or the heirarchy level.
-* Supports __Cross-Region Copy__, __Multi-part Uploads__, __Lifecylce Rules__ and __Pre-Authenticated Requests__
 * __Cross Region Copy__
   * copies one object at a time from one bucket to another.
     * buckets can be in different namespaces(tenancy) or compartments or regions
@@ -136,4 +139,43 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
   * useful for large files. Max object size is 10TB.
   * Parts can be from 10MB to 50GB per part.
   * Parts need part numbers and are consecutive - 1-10,000 is the range. 
+* __Lifecycle Rules__
+  * can be based on prefixes.
+  * Only actions are __Archive__ and __Delete__.
+  * There is __NO__ lifecylce rule to __RESTORE__
+  * For an Archive tier bucket, the only lifecycle operation is delete.
+* __Pre Authenticated Requests__
+  * Provides a method for exposing a bucket or object for anonymoud access
+    * The Creator of the PAR needs to have access that is being granted.
+    * PAR can be timelimited (URL expires after time limit)
+    * Can be bucket scoped or object scoped.
+    * Permissions for object scope can be RO, WO, and RW.
+    * Permissions for bucket scope can be WO. Cannot read for PARs that are bucket scoped.
+    * Users cannot list the contents of a bucket (there is no RO access PAR to a bucket)
+    * PARs are not tied to user's dreds, user can change passwords and will still work
+    * __DO__ depend on the user and his permissions, if the User is deleted, the PARs will fail. If the permissions of the user who generated the PAR no longer allow the operation, it fails.
 
+### File Storage Service.
+
+* AD local service, provides exa-scale storage.
+* Uses NFSv3.
+* Data can be snapshotted. The snapshots are charged by the storage they consume.
+* Can scale on demand without pre-provisioning
+* Encrypted by default.
+* __Setup__
+  1. A File system is created. Its not accessible yet. It needs to be exported to a mount target.
+  2. A _MOUNT TARGET_ created. This is an IP address or a host name - acts as a network path to reach the filesystem.
+     * default 2 mount targets per AD for each tenancy.
+     * A _MOUNT TARGET_ can export 100 fielsystems.
+     * This _MOUNT TARGET_ is localized to an AD, its IP is coming from a AD local subnet.
+     * It requires 3 IPs , one primary, one for HA and a third one.
+       * The two IP addresses are not shown to the user, so if the user manually grabs an ip for use on a resource, that can lead to issues because the user might inadvertedly grab a IP used by the mount target.
+     * Best practice is to create the _MOUNT TARGETS_ in their own subnet and use seclists.
+  3. The FS is exported to (associated with) the _MOUNT TARGET_.
+     * An _EXPORT_ associates the _MOUNT TARGET_ with an __EXPORT PATH__.
+     * An _EXPORT PATH_ is defined when exporting a filesystem and provides a unique path under the _MOUNT TARGET_ to access the filesystem.
+     * The _EXPORT_ is added to the _EXPORT SET_ of the _MOUNT TARGET_, which is list of exports and the paths.
+* Summary 
+  * Mount Target is an IP that maintains an _EXPORT SET_.
+  * Each _EXPORT_ in the _EXPORT SET_ has a unique(within the _MOUNT TARGET_) path called the _EXPORT PATH_ and a corresponding File System.
+  * 
