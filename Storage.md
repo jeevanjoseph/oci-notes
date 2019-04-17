@@ -155,13 +155,17 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
     * PARs are not tied to user's dreds, user can change passwords and will still work
     * __DO__ depend on the user and his permissions, if the User is deleted, the PARs will fail. If the permissions of the user who generated the PAR no longer allow the operation, it fails.
 
-### File Storage Service.
+### File Storage Service
 
 * AD local service, provides exa-scale storage.
+  * Can be accessed from the same AD, different AD or across Regions, and CPE (VPN.FastConnect)
 * Uses NFSv3.
 * Data can be snapshotted. The snapshots are charged by the storage they consume.
+  * Stored in /.snapshot directory. Readonly, space efficient (nothing changes/ nothing stored.)
+  * Always incremental
 * Can scale on demand without pre-provisioning
 * Encrypted by default.
+* Can be accesses from 
 * __Setup__
   1. A File system is created. Its not accessible yet. It needs to be exported to a mount target.
   2. A _MOUNT TARGET_ created. This is an IP address or a host name - acts as a network path to reach the filesystem.
@@ -175,7 +179,20 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
      * An _EXPORT_ associates the _MOUNT TARGET_ with an __EXPORT PATH__.
      * An _EXPORT PATH_ is defined when exporting a filesystem and provides a unique path under the _MOUNT TARGET_ to access the filesystem.
      * The _EXPORT_ is added to the _EXPORT SET_ of the _MOUNT TARGET_, which is list of exports and the paths.
-* Summary 
+* __Summary__
   * Mount Target is an IP that maintains an _EXPORT SET_.
   * Each _EXPORT_ in the _EXPORT SET_ has a unique(within the _MOUNT TARGET_) path called the _EXPORT PATH_ and a corresponding File System.
-  * 
+  * There should be overlaps in the path. `/example/logs` and `/example/` are not allowed, because within the mount target, its ambiguous to which FS we are reffering to. `/example/logs` and `/example/data/` are fine.
+
+* Security
+  * FSS security is layered
+    * IAM 
+      * Controls the resource definitions - like creating mount targets and filesystems, permissions to change these definitions.
+    * SecLists
+      * Controls access at _MOUNT TARGET_ level, and encompasses all FS exported through that _MOUNT TARGET_
+      * SecLists need to open open ports `2048-2050 and 111 for TCP` and `2048 and 111 for UDP` __even within the same subnet__ by creating __STATEFUL RULES__
+    * Export Options
+      * Provides security on an individual FS export
+      * Access can be granular, RO,RW,WO.
+      * permissions are attached by updating a specific FS export. can be done only using the API or CLI. 
+    * NFS v3 Unix permissions
