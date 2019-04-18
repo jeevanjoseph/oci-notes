@@ -72,7 +72,7 @@
   * After storage is allocated, it can be cahnged by reconfiguring the environment fromscrathc or by submitting and sr
 * Data Guard is avaialble in ExaData using the native Oracle tools and utilities
 
-### DB CLI
+#### DB CLI
 
 * command line tool available for VB and BareMetal isntances to perform DB realted opperations
 * NOT available on ExaData
@@ -108,9 +108,11 @@
 * Backups are stored in the local storage or Object Store. (Object Store recommended)
 * DB can leverage service gateways to access Object Store
 
-### ADW
+### ADW & ATP
 
-* Columnar format, generates data summaries automatically, DB gathers stats transparently (part of bulk load)
+* Columnar format for ADW, Row format for ATP.
+* ADW generates data summaries automatically, DB gathers stats transparently (part of bulk load). Can be triggered manually
+* ATP gathers stats periodically. Can be triggered manually.
 * Fully Managed through the API or console
   * Provisioning, patching, scaling - all done through the API or Console
   * No tuning. No considerations for parallelism, partitioning or indexing
@@ -142,6 +144,7 @@
 
 * Pre-defined service names
   * Provide different performance for the clients.
+  * Consumer group settings can be changed via the console. This lets sex max time on queries etc.
   * __High__
     * dedicates most resources to run the queries.
     * supports fewest number of concurrent sql executions = 3; reguardless of the number of CPUs
@@ -158,6 +161,7 @@
 
 #### Using the ADW
 * grant `DWROLE` to users ; No need to specify table spaces for users (ADW does not give access to table spaces)
+
 * Loading data
   * Traditional - good for low volume data
     * SQL*Loader - works from a client machine where data resides
@@ -166,6 +170,8 @@
     * Stage data in an object storage bucket and load directly
     * New PL/SQL package to directly import data from object storage
     * Also supports AWS S3, Azure and OCI-C object storage
+    * Data pump can also be used
+
 * New `DBMS_CLOUD` Package
   * makes it easier to work with coud services
   * No need to create external tables
@@ -178,3 +184,18 @@
 * Built in SQL worksheet and notebook
   * Alternative to SQL Developer
   * based on apache zeppelin
+
+#### Backup and Restore for ADW
+
+* Backup
+  * Automatic backup is daily incremental and weekly full backup
+  * Manual backups can also be made to an object store bucket (bucket should exist, with permissions)
+  * Both auto and manual backups are deleted after 60 days.
+  * During backup, the DB is available. But lifecycle ops like stopping, terminating or scaling are disabled.
+
+* Restore
+  * Resore can be done from any available auto or manual backup.
+  * User can do a Point in time restore
+    * User specifies a timestamp to restore to
+    * ADW figues out the closes backup to use for the fastest restore.
+  * DB in unavailable during restore. The only lifecycle operation available is termination
