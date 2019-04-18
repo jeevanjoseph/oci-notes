@@ -1,5 +1,19 @@
 # Database
 
+- [Database](#database)
+  - [DB Systems](#db-systems)
+    - [VM DB System](#vm-db-system)
+    - [BareMetal DB System](#baremetal-db-system)
+    - [ExaData DB System](#exadata-db-system)
+    - [DB CLI](#db-cli)
+    - [Patching](#patching)
+    - [Backup and Restore](#backup-and-restore)
+  - [ADW & ATP](#adw--atp)
+    - [Using the ADW](#using-the-adw)
+    - [Backup and Restore for ADW & ATP](#backup-and-restore-for-adw--atp)
+
+## DB Systems
+
 * DB options include VM, BareMetal, RAC and Exa Systems
 * Advantages include
   * One click deployment of RAC and DataGuard
@@ -72,7 +86,7 @@
   * After storage is allocated, it can be cahnged by reconfiguring the environment fromscrathc or by submitting and sr
 * Data Guard is avaialble in ExaData using the native Oracle tools and utilities
 
-#### DB CLI
+### DB CLI
 
 * command line tool available for VB and BareMetal isntances to perform DB realted opperations
 * NOT available on ExaData
@@ -84,7 +98,7 @@
   * DB Home management
   * etc.
 
-#### Patching
+### Patching
 
 * Automated Patch discovery & pre-flight checks
 * On demand patching - N-1 patching (one less than the latest patch is available if it has not been applied)
@@ -95,7 +109,7 @@
   * Then patch the DB
 * Integrated with IAM - controls who can list and apply patches
 
-#### Backup and Restore
+### Backup and Restore
 
 * Backups can be managed through the OCI console and APIs. except Exa
   * Exa requires a backup configuration file to be created.
@@ -108,7 +122,7 @@
 * Backups are stored in the local storage or Object Store. (Object Store recommended)
 * DB can leverage service gateways to access Object Store
 
-### ADW & ATP
+## ADW & ATP
 
 * Columnar format for ADW, Row format for ATP.
 * ADW generates data summaries automatically, DB gathers stats transparently (part of bulk load). Can be triggered manually
@@ -159,7 +173,7 @@
     * each query can use only a single CPU
     * Use for data replication -> golden gate
 
-#### Using the ADW
+### Using the ADW
 * grant `DWROLE` to users ; No need to specify table spaces for users (ADW does not give access to table spaces)
 
 * Loading data
@@ -185,7 +199,7 @@
   * Alternative to SQL Developer
   * based on apache zeppelin
 
-#### Backup and Restore for ADW
+### Backup and Restore for ADW & ATP
 
 * Backup
   * Automatic backup is daily incremental and weekly full backup

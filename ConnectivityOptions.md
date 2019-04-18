@@ -1,5 +1,13 @@
-## Connectivity Options for OCI
+# Connectivity Options for OCI
 
+- [Connectivity Options for OCI](#connectivity-options-for-oci)
+  - [Overview](#overview)
+  - [IPSec VPN](#ipsec-vpn)
+    - [Workflow](#workflow)
+  - [Fast Connect](#fast-connect)
+
+
+## Overview
 OCI offers 3 main choices for connectivity to the cloud.
 
 1. Public Internet
@@ -17,7 +25,7 @@ OCI offers 3 main choices for connectivity to the cloud.
    * fast - 1Gbps and 10Gbps available.
    * SLAs are provided.
 
-### IPSec VPN
+## IPSec VPN
 
 IPSec VPN is basically connectivity over the internet. However, a secure tunnel in created between the two(or more) network that are forming the VPN to ensure security. The tunnel baiscally encrypts traffic to ensure integrity of the data(tampering while in transit) as well as the authenticity of the data(data came from a verifiable source, and not spoofed).
 
@@ -30,7 +38,7 @@ IPSec VPN is basically connectivity over the internet. However, a secure tunnel 
   * Outbound - First 10TB free every month
     * Charges /GB for anything over the forst 10TB every month
 
-#### Workflow
+### Workflow
 
 The steps to setup an IPSec VPN are as follows:
 
@@ -42,7 +50,7 @@ The steps to setup an IPSec VPN are as follows:
 
 ![IPSec VPN Setup](network/images/IPSecVPN.png)
 
-### Fast Connect
+## Fast Connect
 
 Private network between the customer's CPE and the OCI VCN. Usually service provider that privides the network is involved.
 

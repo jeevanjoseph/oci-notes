@@ -1,8 +1,26 @@
-## Virtual Cloud Networks
+# Virtual Cloud Networks
 
-My notes on network elements in OCI.
+- [Virtual Cloud Networks](#virtual-cloud-networks)
+  - [CIDR notation](#cidr-notation)
+  - [VCN](#vcn)
+    - [Hands on with VCN](#hands-on-with-vcn)
+    - [Subnets](#subnets)
+      - [Private IP](#private-ip)
+      - [Public IP](#public-ip)
+    - [Internet Gateway](#internet-gateway)
+    - [Route Table](#route-table)
+    - [NAT Gateway](#nat-gateway)
+    - [Service Gateway](#service-gateway)
+    - [Dynamic Routing Gateway](#dynamic-routing-gateway)
+    - [Local Peering Gateway](#local-peering-gateway)
+    - [Remote Peering](#remote-peering)
+    - [Transit Routing](#transit-routing)
+    - [Security Lists](#security-lists)
+    - [Default Components for the VCN](#default-components-for-the-vcn)
+    - [Internal DNS](#internal-dns)
+  - [Questions](#questions)
 
-### CIDR notation
+## CIDR notation
 
 Recollect the basics :
 
@@ -30,7 +48,7 @@ Recollect the basics :
   - The third octect can range from 0000 - 1111 => 0-15
   - So the 4096 addresses will be 10.0.0.255, 10.0.1.255, .... 10.0.15.255
 
-### VCN
+## VCN
 
 VCNs represent distinct networks, in the tenancy with their own CIDR blocks.
 
@@ -41,7 +59,7 @@ VCNs represent distinct networks, in the tenancy with their own CIDR blocks.
   - OCI in addition to this reserves one more, the second IP in the block.
   - So a /30 block will yeild **one** usable address, instead of 4.
 
-#### Hands on with VCN
+### Hands on with VCN
 
 To create a VCN, the CIDR Block and the comaprtment ID are mandatory.
 

@@ -1,7 +1,11 @@
 ## Compute Insances on OCI
-
-
-
+- [Compute Insances on OCI](#compute-insances-on-oci)
+  - [Shapes](#shapes)
+  - [Images](#images)
+  - [Boot Volumes](#boot-volumes)
+  - [Instance Metadata](#instance-metadata)
+  - [Instance Configuration and Pools](#instance-configuration-and-pools)
+  - [Autoscaling](#autoscaling)
 ### Shapes
 Various shapes available across multiple platforms. 
 

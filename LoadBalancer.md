@@ -1,4 +1,11 @@
-## Load Balancing
+# Load Balancing
+
+- [Load Balancing](#load-balancing)
+  - [Overview](#overview)
+  - [Key diiferentiators](#key-diiferentiators)
+  - [Public Loadbalancer service](#public-loadbalancer-service)
+  - [Private Loadbalancer serivce](#private-loadbalancer-serivce)
+## Overview
 
 OCI provides load balancing services, that can be used for service discovery, fault tolerance and HA, and L7 routing.
 OCI load balancers can do health checks on "backend services" and use a variety of algorithms to route traffic between the healthy nodes.
@@ -7,12 +14,16 @@ OCI load balancers can do health checks on "backend services" and use a variety 
   * TCP, HTTP, HTTP/2, Websocket. each protocol requires a separate listener. 
   * SSL features like SSL termination, SSL Tunnneling
   * Content based routing and Session Persistence (sticky sessions)
-* Key diiferentiators
+
+## Key diiferentiators
+
   * You get an actual dedicated public IP, not just a CNAME to a shared LB.
   * Provisioned bandwidth - 100Mbps/400Mbps/8Gbps
     * this means that the capacity is always avaialble - no need to "warm" your LB (like providers that give you bandwidth based on traffic)
     * Single LB for Layer 4 (TCP) and Layer 7(HTTP)  traffic.
-* Public Loadbalancer service
+
+## Public Loadbalancer service
+
   * Used as an entry point for external (internet) traffic. Has a public IP address.
   * Actually a set of 2 Loadbalancers behind a floating VIP.
   * Its regional in scope.
@@ -23,7 +34,9 @@ OCI load balancers can do health checks on "backend services" and use a variety 
     * Deployed in Active/standby fashion - cannot be changed.
     * The secondary is transparent - the service is exposed as a single load balancer.
     * In single AD regions, only one subnet is required. There is no failover in case of AD failure.
-* Private Loadbalancer serivce
+
+## Private Loadbalancer serivce
+
   * These are AD local, and uses a single subnet but are sill deployed in pairs to protect aganist a rack failing (different fault domains)
   * Can be regional or AD specific depending on the subnet used.
   * Its accessible only from within the VCN where the subnet is, and further restricted by security rules.
@@ -35,7 +48,9 @@ OCI load balancers can do health checks on "backend services" and use a variety 
         * where the region has multiple ADs, failover to another AD is available
         * whre the region has a single AD, no failover.
       * If the LB is created in an AD specific subnet, then there is no failover
-* Creation & Management
+
+##Creation & Management
+
   * All LBs have a 
     * __Backend Set__ - set of servers to which traffic is to be forwarded
       * The servers can be in multiple ADs or anywhere as long as there is a network path and the subnet security lists allow traffic to come in.
@@ -50,7 +65,9 @@ OCI load balancers can do health checks on "backend services" and use a variety 
       * Policies are applicable only to TCP and __non-sticky__ HTTP traffic. If __session persistence is enabled__, then cookie info is used for routing.
     * SSL config (opt)
     * Session persistence config (opt)
-* Limitations
+
+##Limitations
+
   * Cannot change shape dynamically - cannot make a 100Mbps LB in to a 400Mbps LB
   * Cannot convert an AD specific LB (created with AD specific Subnets) to a regional LB
   * Each LB has:

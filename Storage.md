@@ -1,4 +1,17 @@
-## Storage
+# Storage
+
+- [Storage](#storage)
+    - [Overview](#overview)
+    - [Locally attached NVMe SSD](#locally-attached-nvme-ssd)
+    - [Block Storage](#block-storage)
+      - [Backup & restore](#backup--restore)
+      - [Volume Groups](#volume-groups)
+      - [Cloning](#cloning)
+      - [Resizing Volumes](#resizing-volumes)
+    - [Object Storage & Archive Storage](#object-storage--archive-storage)
+    - [File Storage Service](#file-storage-service)
+
+### Overview
 
 There are 5 options for storage in OCI
   * Locally attached NVMe SSDs
