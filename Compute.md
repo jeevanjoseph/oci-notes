@@ -1,11 +1,11 @@
 ## Compute Insances on OCI
-- [Compute Insances on OCI](#compute-insances-on-oci)
-  - [Shapes](#shapes)
-  - [Images](#images)
-  - [Boot Volumes](#boot-volumes)
-  - [Instance Metadata](#instance-metadata)
-  - [Instance Configuration and Pools](#instance-configuration-and-pools)
-  - [Autoscaling](#autoscaling)
+* [Compute Insances on OCI](#compute-insances-on-oci)
+  * [Shapes](#shapes)
+  * [Images](#images)
+  * [Boot Volumes](#boot-volumes)
+  * [Instance Metadata](#instance-metadata)
+  * [Instance Configuration and Pools](#instance-configuration-and-pools)
+  * [Autoscaling](#autoscaling)
 ### Shapes
 Various shapes available across multiple platforms. 
 
@@ -27,10 +27,10 @@ Various shapes available across multiple platforms.
   * No performance overhead
   * All devops and automation are available.
   * Usecases
-    - Performance intensive workloads
-    - Non Virtualized workloads
-    - Bring your own license
-    - Run your own hypervisor
+    * Performance intensive workloads
+    * Non Virtualized workloads
+    * Bring your own license
+    * Run your own hypervisor
 
 * Virtual Machine
   * A hypervisor runs on the same hardware as the bare metal. 

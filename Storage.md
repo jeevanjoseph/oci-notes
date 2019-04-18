@@ -1,24 +1,25 @@
 # Storage
 
-- [Storage](#storage)
-    - [Overview](#overview)
-    - [Locally attached NVMe SSD](#locally-attached-nvme-ssd)
-    - [Block Storage](#block-storage)
-      - [Backup & restore](#backup--restore)
-      - [Volume Groups](#volume-groups)
-      - [Cloning](#cloning)
-      - [Resizing Volumes](#resizing-volumes)
-    - [Object Storage & Archive Storage](#object-storage--archive-storage)
-    - [File Storage Service](#file-storage-service)
+* [Storage](#storage)
+    * [Overview](#overview)
+    * [Locally attached NVMe SSD](#locally-attached-nvme-ssd)
+    * [Block Storage](#block-storage)
+      * [Backup & restore](#backup--restore)
+      * [Volume Groups](#volume-groups)
+      * [Cloning](#cloning)
+      * [Resizing Volumes](#resizing-volumes)
+    * [Object Storage & Archive Storage](#object-storage--archive-storage)
+    * [File Storage Service](#file-storage-service)
 
 ### Overview
 
 There are 5 options for storage in OCI
-  * Locally attached NVMe SSDs
-  * Remotely mounted iSCSI Block Storage (based on NVMe SSDs as well)
-  * File Storage Service (NFSv3, largest capacity 8ExB)
-  * Object storage
-  * Archive storage
+
+* Locally attached NVMe SSDs
+* Remotely mounted iSCSI Block Storage (based on NVMe SSDs as well)
+* File Storage Service (NFSv3, largest capacity 8ExB)
+* Object storage
+* Archive storage
 
 ### Locally attached NVMe SSD
 
