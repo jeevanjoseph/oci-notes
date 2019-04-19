@@ -1,10 +1,10 @@
 # Connectivity Options for OCI
 
-- [Connectivity Options for OCI](#connectivity-options-for-oci)
-  - [Overview](#overview)
-  - [IPSec VPN](#ipsec-vpn)
-    - [Workflow](#workflow)
-  - [Fast Connect](#fast-connect)
+* [Connectivity Options for OCI](#connectivity-options-for-oci)
+  * [Overview](#overview)
+  * [IPSec VPN](#ipsec-vpn)
+    * [Workflow](#workflow)
+  * [Fast Connect](#fast-connect)
 
 
 ## Overview

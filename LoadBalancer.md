@@ -1,10 +1,10 @@
 # Load Balancing
 
-- [Load Balancing](#load-balancing)
-  - [Overview](#overview)
-  - [Key diiferentiators](#key-diiferentiators)
-  - [Public Loadbalancer service](#public-loadbalancer-service)
-  - [Private Loadbalancer serivce](#private-loadbalancer-serivce)
+* [Load Balancing](#load-balancing)
+  * [Overview](#overview)
+  * [Key diiferentiators](#key-diiferentiators)
+  * [Public Loadbalancer service](#public-loadbalancer-service)
+  * [Private Loadbalancer serivce](#private-loadbalancer-serivce)
 ## Overview
 
 OCI provides load balancing services, that can be used for service discovery, fault tolerance and HA, and L7 routing.

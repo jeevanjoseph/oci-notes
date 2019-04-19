@@ -1,16 +1,16 @@
 # Database
 
-- [Database](#database)
-  - [DB Systems](#db-systems)
-    - [VM DB System](#vm-db-system)
-    - [BareMetal DB System](#baremetal-db-system)
-    - [ExaData DB System](#exadata-db-system)
-    - [DB CLI](#db-cli)
-    - [Patching](#patching)
-    - [Backup and Restore](#backup-and-restore)
-  - [ADW & ATP](#adw--atp)
-    - [Using the ADW](#using-the-adw)
-    - [Backup and Restore for ADW & ATP](#backup-and-restore-for-adw--atp)
+* [Database](#database)
+  * [DB Systems](#db-systems)
+    * [VM DB System](#vm-db-system)
+    * [BareMetal DB System](#baremetal-db-system)
+    * [ExaData DB System](#exadata-db-system)
+    * [DB CLI](#db-cli)
+    * [Patching](#patching)
+    * [Backup and Restore](#backup-and-restore)
+  * [ADW & ATP](#adw--atp)
+    * [Using the ADW](#using-the-adw)
+    * [Backup and Restore for ADW & ATP](#backup-and-restore-for-adw--atp)
 
 ## DB Systems
 
