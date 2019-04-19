@@ -6,7 +6,7 @@ The IAM system in OCI provides all Identity, Authorization and Access management
 
 ## Principals
 
-Principals are any idetity on which IAM can act on. There are two types in OCI
+Principals are any identity on which IAM can act on. There are two types in OCI
 * Users
   * standard identities, usually a user or a service account. 
   * has passwords, email addresss and features like API keys and Auth Tokens
@@ -43,7 +43,7 @@ Principals are any idetity on which IAM can act on. There are two types in OCI
 ## Policies
 
 * Syntax
-  * `Allow` *subject* `to` *verb* *resource type* `in` *location* `where` *condition*c
+  * `Allow` *subject* `to` *verb* *resource type* `in` *location* `where` *condition*
   * eg: `Allow Administrators to manage all-resources in tenancy`
   * Policies **always** grant privileges, since by default there are no privileges granted.
   * The subject is always a group or dynamic group since polices cannot be attached to Principals 
@@ -52,7 +52,7 @@ Principals are any idetity on which IAM can act on. There are two types in OCI
   * Instead on specifing a group name, you can also specify the OCID, by prefixing the keywork `id`
     * `Allow id` <*ocid*>  `to` *verb* *resource type* `in id` <*OCID of compartment*>  `where` *condition* 
 
-* Verb
+* **Verb**
   * **Inspect** - Ability to list the resource. The user can discover the existence of a resource.
     * For policies and networking resources, the list displays the content of the policy or say, the seclist.
   * **Read** - Can *Inspect*, but also get the details of the resource including it's metadata.
@@ -83,21 +83,86 @@ Principals are any idetity on which IAM can act on. There are two types in OCI
         * This mapping causes users in groups that have poilices that grant them atleast the INSPECT verb to be able to to make the API call.
         * *sam.fisher* belongs to a **Group** that has been given access to the verb INSPECT, and VOLUME_INSPECT (the permission the volume service requires users to have) is mapped to the INSPECT verb,  therfore *sam.fisher* has access to the VOLUME_INSPECT permission, and can use the API to list volumes.
 
-* Resource Type
+*** Resource Type**
   * Identifies a resource type or family.
     * all-resources - keyword that implies that inclues every resource in the tenancy, including resources that will exist in the future
     * instance-family - Compute resources: instances, images, instance configurations, auto scaling groups
-    * database-family - DB systems, db nodes, db homes
+    * database-family - db-systems, db nodes, db-homes etc.
+    * autonomous-database-family - autonomous-database, autonomous-database-backup
     * virtual-network-family - VCN, Subnets, Seclists etc,
     * object-family - Buckets, Objects
     * volume-family - Volumes, volume attachments, volume backups
-* Location 
+    * Some actions may require access to multiple resource types : Backing up a Block Volume requires access to both Volumes as well as VolumeBackups.
+      * The user can gain the access from multiple statements in multiple policies.
+  
+* **Location** 
   * Identifies the scope of the policy. This restricts the privileges granted to the location.
     * Tenancy - actually the root compartment. 
       * Widest access, since polices in a compartment are inherited by the child compartment.
     * Compartment - restricted to a specific compartment
-    * * Instead on specifing a compartment name, you can also specify the OCID, by prefixing the keywork `id`
+      * Instead on specifing a compartment name, you can also specify the OCID, by prefixing the keywork `id`
       * `Allow id` <*ocid*>  `to` *verb* *resource type* `in id` <*OCID of compartment*>  `where` *condition* 
+    * In a multi tiered heirarchy, depending on where the policy is attached, the location reference needs to change.
+      * When the location is a compartment and the policy will be attached to that compartment itself of its parent, then the compartment can be reffered to by name.
+      * However if the policy is attached to a compartment above the parent then you need to refer the **Location** as relative to where the policy is attached.
+      * Consider this
+        * ROOT
+          * CompA
+            * CompB
+              * CompC
+      * If we create a policy like `Allow Admin-C to manage all-resources in CompC`
+      * We can attach this policy on any of the compartments.
+        * To attach this on the ROOT, you need to write this as `Allow Admin-C to manage all-resources in CompA:CompB:CompC` 
+        * TO attach the policy on CompB or CompC, you can write :  `Allow Admin-C to manage all-resources in CompC`
+
+* **Conditions**
+  * Boolean checks that can be combined with `any` or `all` (logical OR or AND)
+  * The variables that can be used in the expression include a standard list of variables and variables that are specific to the service
+  * The variables pertain to each request that is made and includes the metadata about the request 
+  * The policy is evaluated for each request to decide whether to authorize the request or not.
+  * Standard variables include
+    * `request.user.id` - The OCID of the user making the request. 
+    * `request.groups.id` - List of group OCIDs the user has membership in 
+    * `target.compartment.id` - the OCID of the compartment containig the primary resource.
+    * `request.operation` - the operation being requested - ListInstances
+    * `request.permission` -  the underlying (service specific) permisson being requested (that maps to the verbs)
+    * `request.region` - the region where the request is made in - *use this to limit access to a specific region - eg: PHX-Admins* 
+    * `request.ad` - the ad where the request in made in - *use this to limit access to a specific Availability Domain - eg: AD3-Admins*
+
+## Resource Locations
+
+Most resources are regional. Like a VCN or an InstnacePool. Others are :
+
+* Global
+  * These are resources or entities that are not attached to a location and operate the same everywhere
+  * IAM - Identity and Access is at at the tenancy level, and are valid in all regions the tenant is subscribed to.
+    * You do not create users, groups or policies or compartments in each region. These are valid acrosss regions
+  * DNS - By definition this is global
+  * Keys , Vaults - they need to be defined once and centrally managed. Never makes sense to manage keys in every region you operate in.
+
+* Avaialbility Domain - Most things that are attached to Physical things, and not abstract concepts.
+  * Subnet - Can be AD specific or Regional
+  * Compute Instances - these are actual VMs or BMs, so they need to physically be in a single place.
+  * Block Volume - SSD Disks - mounted over iSCSI, so these are AD scoped
+  * DB system - These are backed by instances, and either local NVMe or Block Storage, so they are also AD scoped.
+    * Of course you can access a DB from another AD or region, given access and network paths exist.
+  * File Systems and Mount Targets - These are AD local, but can be accesses from other ADs or regions.
+
+## Federation 
+
+OCI can federate identities to another IdP (Identity Provider). This is common where there already exists users with their passwords (identities) that need to leverage their existing credentials to use OCI. The steps for federation are 
+
+* The admin sets up a federation trust between the IdP and SP (OCI)
+* The admin will be able to map the groups on the IdP to groups on OCI (or create new groups on OCI)
+* Once done users can see an SSO option, which will take the user to the SSO login page, where the IdP authenticates the user.
+* Once authenticated, the user is returned to OCI, which accepts the identity provided by the IdP due to the trust relationship.
+* The IdP also provides the group information that the IdP maintains. 
+* IAM maps the IdP groups to OCI groups.
+* Now this identity can be treated as normal, since it has a principal and groups (so now policies can be appplied to the requests this user makes for instance) 
+* **Caveats**
+  * Users who belong to more than 50 groups on the IdP cannot be authenticated in OCI 
+
+
 
 
 
