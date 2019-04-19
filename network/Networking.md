@@ -1,24 +1,26 @@
 # Virtual Cloud Networks
 
-* [Virtual Cloud Networks](#virtual-cloud-networks)
-  * [CIDR notation](#cidr-notation)
-  * [VCN](#vcn)
-    * [Hands on with VCN](#hands-on-with-vcn)
-    * [Subnets](#subnets)
-      * [Private IP](#private-ip)
-      * [Public IP](#public-ip)
-    * [Internet Gateway](#internet-gateway)
-    * [Route Table](#route-table)
-    * [NAT Gateway](#nat-gateway)
-    * [Service Gateway](#service-gateway)
-    * [Dynamic Routing Gateway](#dynamic-routing-gateway)
-    * [Local Peering Gateway](#local-peering-gateway)
-    * [Remote Peering](#remote-peering)
-    * [Transit Routing](#transit-routing)
-    * [Security Lists](#security-lists)
-    * [Default Components for the VCN](#default-components-for-the-vcn)
-    * [Internal DNS](#internal-dns)
-  * [Questions](#questions)
+- [Virtual Cloud Networks](#virtual-cloud-networks)
+  - [CIDR notation](#cidr-notation)
+  - [VCN](#vcn)
+    - [Hands on with VCN](#hands-on-with-vcn)
+    - [Subnets](#subnets)
+      - [Private IP](#private-ip)
+      - [Public IP](#public-ip)
+    - [Internet Gateway](#internet-gateway)
+    - [Route Table](#route-table)
+    - [NAT Gateway](#nat-gateway)
+    - [Service Gateway](#service-gateway)
+    - [Dynamic Routing Gateway](#dynamic-routing-gateway)
+    - [VCN Peering](#vcn-peering)
+    - [Local Peering Gateway](#local-peering-gateway)
+    - [Remote Peering](#remote-peering)
+    - [Transit Routing](#transit-routing)
+    - [Security Lists](#security-lists)
+    - [Default Components for the VCN](#default-components-for-the-vcn)
+    - [Internal DNS](#internal-dns)
+  - [Edge Security](#edge-security)
+  - [Questions](#questions)
 
 ## CIDR notation
 
@@ -152,6 +154,7 @@ A route table is a set of routing instuctions for network traffic in a VCN.
 * Each subnet has a single route table
 * Being attahed to a subnet makes the route table an AD scoped element.
 * A route rule is used when the destination address is outside the VCN's CIDR.
+  * You can explicitly provide a Private IP as the target for a route rule for cases when you want to say direct internet traffic to a specific internal destination (like a firewall) that will then forward the request outward
 * No route rules are requrired when routing traffic within the VCN itself.
 * Route rules are required when using gateways or connections
 
@@ -160,30 +163,51 @@ A route table is a set of routing instuctions for network traffic in a VCN.
 Its used for connecting a private network/subnet to the internet.
 
 * The hosts in the subnet do not need to assigned a public IP address.
+* A Route must exist that maps a  source CIDR to the the NAT-G for traffic.
+* NAT-G gets a public IP, and this IP cannot be changed, and customer's reserved public IP cannot be used
 * Traffic can go out of the subnet to the internet and return, 
   * However nothing from the internet can connect to any thing on the private subnet.
 * There can be multiple NAT gateways per VCN (unlike a single Internet Gateway per VCN) 
   * However a given subnet in the VCN can only route traffic to a single NAT gateway.
+  * Having multiple NAT gateways makes it possible for the internet destination to distinguish between subnets based on the public IP of the NAT gatyeway.
+* When switching from an IG to a NAT-G, the original public subnets cannot be made private. The public IPs in the subnet can be deleted though.
+* A NAT-G can be used only by entities within the VCN
+  * If the VCN is peered, or connected to CPE with IPsec/FastConnnect, those sysyems cannot use the NAT-G
 
 ### Service Gateway
 
 Its a special gateway to route traffic from a subnet to **public OCI services**.
 
 * There is one service gateway per VCN.
+  * Control which subnets in the VCN can use the SG
+  * 
+* With a service gateway, there in no need for an IG or NAT. 
+* Instances in private subnets can call *public* OCI services, over the interal network fabric
 * Although the service is public, since its on OCI itself, a Service Gateway routes the traffic internally.
 * Traffic over the service gateway does not traverse the internet.
 * Object storage is the only service supported now.
-* Route table needs to be updated, but instead of a destination CIDR block, you specify the  destination service.
+* RouteTables and SecurityLists needs to be updated, but instead of a destination CIDR block, you specify the  destination service.
+* Instances in Peered VCNs or CPE (over IPSecVPN/FastConnect) cannot use the service gateway.
+  * Sevices like Object storage support **Public Peering** over FastConnect/IPSecVPN for CPEs to talk to public services over a private network
+  *   
 
 ### Dynamic Routing Gateway
 
 A DRG is used to connect your VCN to your OnPrem network.
 
-* Its a standalone ibject, but has a 1:1 relationship with a VCN
+* Its a standalone object, but has a 1:1 relationship with a VCN
 * Connects traffic from a private subnet to destinations that are in the a remote network, that are not internet.
 * The traffic is entirely private, but its crossing the boundary of the VCN
 * Connectivity is provided by either and IPSec VPN or FastConnect(dedicated channel)
 * Using a DRG requires the subnet to have an entry in the route table.  
+
+
+### VCN Peering
+
+* Connects two VCNs with each other over the Oracle private network fabric
+* Avoid traffic being routed over internet and does nto require IG or NAT-G
+* Peered networks should not have overlapping subnets or addresses
+* Peering can be done between two separate tenancies as well.
 
 ### Local Peering Gateway
 
@@ -194,10 +218,11 @@ Remember that VCNs are regional in scope, so "Local" in this context means that 
 * LPG is defined for a specific VCN.
 * To connect two different VCNs,
   * Each VCN must have an LPG.
+  * To setup LPGs and create connection, specific IAM policies are needed.
   * On each VCN, a route rule is defined such that 
-    * The route destination `is the VCN's own LPG
+    * The route destination is the VCN's own LPG
     * The destination CIDR is the CIDR of the other VCN.
-    * It effectively reads t`hat for addresses in the destination CIDR, use this LPG.
+    * It effectively reads that for addresses in the destination CIDR, use this LPG.
   * The LPGs are then connected to each other.
   * For a VCN to talk to 2 other VCNs in the same region, different LPG pairs are used.
   * VCNs in a peering relationship cannot have overlapping CIDRs
@@ -216,6 +241,13 @@ Oracle backbone network, instead of sending traffic over the internet.
 * Traffic is private and goes over the Oracle channel between the regions
 * There is no _Remote Peering Gateway_, a pair of DRGs are used.
 * The DRGs are connected to each other using a **Remote Peering Connection**
+  * There is only one DRG for a VCN at a time
+  * To connect to multiple remote networks, the DRG uses separate **RPC**s. 
+  * This is unlike LPGs where the VCN can have multiple LPGs, so for multiple networks, different LPG pairs can be used within the same VCN.
+* The traffic flow is 
+  * Source vNIC-1 -> DRG-1 -> DRG-2-> Target vNIC-2
+* Specific IAM policies are required. There are requestor as well as acceptor policies
+* Common for cross-region replication scenarios
 
 ### Transit Routing
 
@@ -256,6 +288,8 @@ There is an internal DNS within OCI that resolves the FQDNs and other domain nam
 * DNS Labels can be set for the various network elements forming the FQDN for an instance
   * <hostname>.<subnet_dnslabel>.<vcn_dnslabel>.oraclevcn.com
   * These FQDNs __always__ resolve to the private IP address even if the instnace has a Public IP address
+
+## Edge Security
 
 ## Questions
 
