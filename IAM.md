@@ -43,30 +43,45 @@ Principals are any idetity on which IAM can act on. There are two types in OCI
 ## Policies
 
 * Syntax
-  * `Allow` *subject* `to` *verb* *resource type* `in` *location* `where` *condition*
+  * `Allow` *subject* `to` *verb* *resource type* `in` *location* `where` *condition*c
   * eg: `Allow Administrators to manage all-resources in tenancy`
   * Policies **always** grant privileges, since by default there are no privileges granted.
   * The subject is always a group or dynamic group since polices cannot be attached to Principals 
+    * The only exception is a **Service**. You can do a `Allow` *Service* `to` *verb* *resource type* `in` *location* `where` *condition*
+    * This is useful in cases like Allowing the OKE service to manage resources (since it needs to bring up LBs and Nodes and other resources)
+  * Instead on specifing a group name, you can also specify the OCID, by prefixing the keywork `id`
+    * `Allow id` <*ocid*>  `to` *verb* *resource type* `in id` <*OCID of compartment*>  `where` *condition* 
 
 * Verb
-  * **Inspect** - Ability to list the resource. The user can discover the existence of a resource, but cannot get any real details 
+  * **Inspect** - Ability to list the resource. The user can discover the existence of a resource.
+    * For policies and networking resources, the list displays the content of the policy or say, the seclist.
   * **Read** - Can *Inspect*, but also get the details of the resource including it's metadata.
   * **Use** - *Read* + Ability to work with the resource. The actions permissible varies by service.
+    * This includes the ability to update a resource except in cases where the update is equivalent to creating a resource (update policy/seclist)
   * **Manage** - full privileges
-  * These gives pre defined **permissions** to the subject.
-  * Permissions are defined by the service. They are not directly usable by the user.
-  * Instead they are mapped to the 4 verbs above. 
-  * When using the API (in any form - console, CLI , SDK, HTTP) each API operation will require the user to hav a permission
-    * The permissions are mapped to the verbs
-    * Users are grouped in to Groups
-    * Groups are given Verbs through policies.
-    * When *sam.fisher* calls a `LIST VOLUMES` API call, it will succeed only if
-      * *sam.fisher* is in a **Group** (perhaps more than one)
-      * atleast one of those groups have been granted atleast the `INSPECT` privilege through a **Policy**.
-      * The Volumes service has defined a permission called, say, `VOLUME_INSPECT`.
-      * The `VOLUME_INSPECT` permission is mapped to the `INSPECT` verb by the service.
-      * This mapping causes users in groups that have poilices that grant them atleast the INSPECT verb to be able to to make the API call.
-      * *sam.fisher* belongs to a **Group** that has been given access to the verb INSPECT, and VOLUME_INSPECT (the permission the volume service requires users to have) is mapped to the INSPECT verb,  therfore *sam.fisher* has access to the VOLUME_INSPECT permission, and can use the API to list volumes.
+  * Specific Cases
+    * **Users** - with the **Use** verb on both *Users* and *Groups*, we can change the Group memberships. 
+    * **Policies** - Updating a policy requires the **Manage** verb, because updating a policy can overwrite the existing statements and is effectively a new policy.
+    * **Object Storage** - inspect lets you list the contents of a bucket. Read lets you download.
+    * **Load Balancers** - Inspect gives full access to read the details of the LB, including the the backed sets etc.
+    * **Networking** - Some "*update like operations*" like peering VCNs require the **Manage** verb.
+      * Also with networking, usually a resource is created and attached to a VCN, like a route table. For this, the **Manage** verb for the resource as well as the VCN is required, because the realtionship with the VCN is being established.
+      * However, to update the same RouteTable once it's created, you no longer need manage on the VCN. This can mean that a seclist change can cause havok, without having **Manage** verb on the CN 
+  * Verbs and Permissions
+    * These verbs gives pre defined **permissions** to the subject.
+    * Permissions are defined by the service. They are not directly usable by the user.
+    * Instead they are mapped to the 4 verbs above. 
+    * When using the API (in any form - console, CLI , SDK, HTTP) each API operation will require the user to hav a permission
+      * The permissions are mapped to the verbs
+      * Users are grouped in to Groups
+      * Groups are given Verbs through policies.
+      * When *sam.fisher* calls a `LIST VOLUMES` API call, it will succeed only if
+        * *sam.fisher* is in a **Group** (perhaps more than one)
+        * atleast one of those groups have been granted atleast the `INSPECT` privilege through a **Policy**.
+        * The Volumes service has defined a permission called, say, `VOLUME_INSPECT`.
+        * The `VOLUME_INSPECT` permission is mapped to the `INSPECT` verb by the service.
+        * This mapping causes users in groups that have poilices that grant them atleast the INSPECT verb to be able to to make the API call.
+        * *sam.fisher* belongs to a **Group** that has been given access to the verb INSPECT, and VOLUME_INSPECT (the permission the volume service requires users to have) is mapped to the INSPECT verb,  therfore *sam.fisher* has access to the VOLUME_INSPECT permission, and can use the API to list volumes.
 
 * Resource Type
   * Identifies a resource type or family.
@@ -75,7 +90,14 @@ Principals are any idetity on which IAM can act on. There are two types in OCI
     * database-family - DB systems, db nodes, db homes
     * virtual-network-family - VCN, Subnets, Seclists etc,
     * object-family - Buckets, Objects
-    * volume-family - Volumes, volume attachments, volume backupss
-    * 
+    * volume-family - Volumes, volume attachments, volume backups
+* Location 
+  * Identifies the scope of the policy. This restricts the privileges granted to the location.
+    * Tenancy - actually the root compartment. 
+      * Widest access, since polices in a compartment are inherited by the child compartment.
+    * Compartment - restricted to a specific compartment
+    * * Instead on specifing a compartment name, you can also specify the OCID, by prefixing the keywork `id`
+      * `Allow id` <*ocid*>  `to` *verb* *resource type* `in id` <*OCID of compartment*>  `where` *condition* 
+
 
 
