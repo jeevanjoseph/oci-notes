@@ -1,15 +1,15 @@
 # Storage
 
-* [Storage](#storage)
-    * [Overview](#overview)
-    * [Locally attached NVMe SSD](#locally-attached-nvme-ssd)
-    * [Block Storage](#block-storage)
-      * [Backup & restore](#backup--restore)
-      * [Volume Groups](#volume-groups)
-      * [Cloning](#cloning)
-      * [Resizing Volumes](#resizing-volumes)
-    * [Object Storage & Archive Storage](#object-storage--archive-storage)
-    * [File Storage Service](#file-storage-service)
+- [Storage](#storage)
+    - [Overview](#overview)
+    - [Locally attached NVMe SSD](#locally-attached-nvme-ssd)
+    - [Block Storage](#block-storage)
+      - [Backup & restore](#backup--restore)
+      - [Volume Groups](#volume-groups)
+      - [Cloning](#cloning)
+      - [Resizing Volumes](#resizing-volumes)
+    - [Object Storage & Archive Storage](#object-storage--archive-storage)
+    - [File Storage Service](#file-storage-service)
 
 ### Overview
 
@@ -79,6 +79,7 @@ Block volumes are remote block devices that can be mounted on the OS and are bac
  Group volumes together to perform backup and other tasks like cloning. Makes it easier to manage storage for a logical group - like an application - as a single unit. Example : backup the web tier and database of an application, even across conpartments with this feature.
 
 * Volumes can belong to multiple compartments.
+* They are AD local, and only Volumes in that AD can be added to a VolumeGroup in the same AD  
 * Only volumes in the available status may be added to a group
 * A Volume can be part of only one Volume Group at a time
 * When deleting a volume thats a part of a VG, the volume has to be first removed from the VG before deletion
