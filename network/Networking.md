@@ -11,6 +11,7 @@
     - [Route Table](#route-table)
     - [NAT Gateway](#nat-gateway)
     - [Service Gateway](#service-gateway)
+      - [CIDR Labels](#cidr-labels)
     - [Dynamic Routing Gateway](#dynamic-routing-gateway)
     - [VCN Peering](#vcn-peering)
     - [Local Peering Gateway](#local-peering-gateway)
@@ -179,9 +180,10 @@ Its used for connecting a private network/subnet to the internet.
 
 Its a special gateway to route traffic from a subnet to **public OCI services**.
 
+* Service gateways are regional, they provide access to Oracle services in the same region as the VCN
 * There is one service gateway per VCN.
-  * Control which subnets in the VCN can use the SG
-  * 
+  * You can control which subnets in the VCN can use the SG
+  * Various subnets in the VCN can choose to use the SG or not, based on the route rules for the subnet.
 * With a service gateway, there in no need for an IG or NAT. 
 * Instances in private subnets can call *public* OCI services, over the interal network fabric
 * Although the service is public, since its on OCI itself, a Service Gateway routes the traffic internally.
@@ -190,7 +192,20 @@ Its a special gateway to route traffic from a subnet to **public OCI services**.
 * RouteTables and SecurityLists needs to be updated, but instead of a destination CIDR block, you specify the  destination service.
 * Instances in Peered VCNs or CPE (over IPSecVPN/FastConnect) cannot use the service gateway.
   * Sevices like Object storage support **Public Peering** over FastConnect/IPSecVPN for CPEs to talk to public services over a private network
-  *   
+
+#### CIDR Labels
+
+CIDR Labels is an easy way to target oracle services in route rules, without knowing the actual IP addresses.
+This also makes sure that the routes work even if the CIDRs change in the future.
+
+* OCI <*region*> Object Storage - only access to object storage in the region
+* All <*region*> Services in Oracle Services Network - much wider access, including object storage.
+
+* A Service Gateway can use only one CIDR label. 
+* Likewise, a RouteTable can have only one RouteRule with a CIDR label. 
+  * You cannot have two rules targeting the two CIDR labels. 
+* The route rule that targets a **Service Gateway** needs to specify the same CIDR label enabled in the Service Gateway.
+  * The console ensure this rule. 
 
 ### Dynamic Routing Gateway
 
