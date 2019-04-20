@@ -1,4 +1,4 @@
-# OCI Ceritification Prep
+# OCI Certification Prep
 
 My notes on OCI.
 
