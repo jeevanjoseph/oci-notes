@@ -152,6 +152,7 @@ Without an Internet Gateway, a VCN is isolated from the internet even if it has 
 A route table is a set of routing instuctions for network traffic in a VCN.
 
 * Each subnet has a single route table
+  * A single route table can be shared among many subnets and across ADs in the same region
 * Being attahed to a subnet makes the route table an AD scoped element.
 * A route rule is used when the destination address is outside the VCN's CIDR.
   * You can explicitly provide a Private IP as the target for a route rule for cases when you want to say direct internet traffic to a specific internal destination (like a firewall) that will then forward the request outward
@@ -193,9 +194,12 @@ Its a special gateway to route traffic from a subnet to **public OCI services**.
 
 ### Dynamic Routing Gateway
 
-A DRG is used to connect your VCN to your OnPrem network.
+A DRG is used to connect your VCN to your OnPrem network or to a remote VCN.
 
-* Its a standalone object, but has a 1:1 relationship with a VCN
+* Its a standalone object, but has a 1:1 relationship with a VCN. A VCN can be attached to only one DRG at a time and vice versa
+* The DRG needs to reside in a compartment for access control reasons.
+* It can be atached to an VCN and detached from it any time
+  * Attaching the DRG to an VCN creates an DRGAttachment object, and deleting this object detaches it.
 * Connects traffic from a private subnet to destinations that are in the a remote network, that are not internet.
 * The traffic is entirely private, but its crossing the boundary of the VCN
 * Connectivity is provided by either and IPSec VPN or FastConnect(dedicated channel)
@@ -262,7 +266,9 @@ This is a case where the CPE needs to connect to multiple VCNs in the same regio
 
 ### Security Lists
 
-* These are objects that are attached to subnets. When attached, they control the traffic that can flow in and out of all elements in the subnet.
+* These are objects that are attached to subnets. 
+  * When attached, they control the traffic that can flow in and out of all elements in the subnet.
+  * A subnet can have a max of upto 5 seclits
 * Seclists are applied whether an instance is communicating with another host on the same VCN or not.
 * Rules can be stateful or stateless. Default is __stateful__
 * Stateful rules use connection tracking.
