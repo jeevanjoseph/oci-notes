@@ -1,6 +1,6 @@
-## Virtual Cloud Networks
+# OCI Ceritification Prep
 
-My notes on network elements in OCI.
+My notes on OCI.
 
 * [Networking](./network/Networking.md)
 * [Connectivity](./ConnectivityOptions.md)
