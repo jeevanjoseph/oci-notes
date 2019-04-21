@@ -5,6 +5,7 @@
   - [VCN](#vcn)
     - [Hands on with VCN](#hands-on-with-vcn)
     - [Subnets](#subnets)
+      - [vNICs](#vnics)
       - [Private IP](#private-ip)
       - [Public IP](#public-ip)
     - [Internet Gateway](#internet-gateway)
@@ -111,17 +112,35 @@ They divide the IP namespace of the VCN in to distinct groups that can be manage
 Quick creating a subnet with the console will create the subnet and the default resources like the seclist, route table and dhcp option,
 and additionally will create 3 subnets distributed in the 3 ADs, and choose the CIDR blocks for the VCN (will be a /16 network) as well as the subnets.
 
+#### vNICs
+
+A vNIC is a networking service in OCI that enables the communication from an instance to the underlying physical NIC card.
+  * X5 hardware has 2 NICs, but only one is active
+  * X7 hardware has 2 NICs of 25 Gbps each and both are active
+  * Primary vNIC
+    * Every instance has a primary vNIC thats created and configured at lauch time
+    * Primary vNICs cannot be removed from an isntance.
+  * Secondary vNIC
+    * This can be in the same subnet, a different one, a whole different VCN. 
+    * It must be in the same availabily domain 
+      * It cannot be in a subnet thats in a different availability domain
+  * The number of vNICs that can be attached to an instance depends on the shape.
+  * A vNIC must always be attached to an isntance.
+    * Detacing the vNIC deletes it
+    * They are detached and deleted when an instance terminates
+  * The bandwidth available to an instance does not depend on the number of vNICs. That just depends on the instance shape. 
+
 #### Private IP
 
-Every instance has a private IP associated with it.
-
-*A private IP can optionally have a public IP associated with it if its in a public subnet.
-*Every Instance has at least 2 vNICs. Can have more.
-  *The vNICs on an instance could be connected to multiple subnets or even multiple VCNs.
-  *Each vNIC has a primary private IP address, as well as upto 31 secondary private IP addresses. total=32
-  *The primary private IP address is assigned at boot time and the secondary IP addresses are only assigned after launch.
-  *A secondary private IP can be moved from one vNIC to antother
-    *Helpful in failover. If one instance fails, the IP can be moved to another identical instance.
+* Every instance has a private IP associated with it.
+* A private IP can optionally have a public IP associated with it if its in a public subnet.
+* Every Instance has at least a primary. Can have more.
+  * The vNICs on an instance could be connected to multiple subnets or even multiple VCNs.
+    * This implies that the seclists and route tables on one VCN might not stop traffic to an instance which has an alternate network path through a second vNIC attachment
+  * Each vNIC has a primary private IP address, as well as upto 31 secondary private IP addresses. total=32
+  * The primary private IP address is assigned at boot time and the secondary IP addresses are only assigned after launch.
+  * A secondary private IP can be moved from one vNIC to antother
+    * Helpful in failover. If one instance fails, the IP can be moved to another identical instance.
 
 #### Public IP
 
