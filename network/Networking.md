@@ -48,7 +48,7 @@ Recollect the basics :
 * Another example `10.0.0.0/20`
   * 20 bits are blocked, leaving 12 bits for the addresses, or 2<sup>12</sup> = 4096 addresses.
   * Of the 20 bits blocked => first two octets, and the first 4 bits of the 3rd octet, leaving 4 bits in the 3rd octect
-    * **00010001.00000000.0000**_0000.00000000_
+    * **00001010.00000000.0000**_0000.00000000_
   * The third octect can range from `0000`-`1111` => 0-15 (with 4 bits we can have 2<sup>4</sup>=16 values)
   * So the 4096 addresses will be `10.0.0.255`, `10.0.1.255`, ... `10.0.15.255`
 
