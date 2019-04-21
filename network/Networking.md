@@ -290,12 +290,12 @@ Oracle backbone network, instead of sending traffic over the internet.
 * Specific IAM policies are required. There are requestor as well as acceptor policies
 * Common for cross-region replication scenarios
 
->  #### Confusing Terms
+> **Confusing Terms**
 >    * **Private Peering**
->      * Customer extending thier data center in to OCI.
->      * Conncetion established through IPSecVPN or FastConnect
+>      * Customer extending their data-center into OCI.
+>      * Connection established through IPSecVPN or FastConnect
 >    * **Public Peering**
->      * Customer is makign calls to OCI public services like Object Storage, over a dedicated private channel
+>      * Customer is making calls to OCI public services like Object Storage, over a dedicated private channel
 >      * Connection established through FastConnect
 >      * Does not require a DRG in OCI, since the connectivity is established with an OCI Managed public service
 >    * **Remote Peering**
