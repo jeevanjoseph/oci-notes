@@ -122,7 +122,7 @@ A vNIC is a networking service in OCI that enables the communication from an ins
     * Primary vNICs cannot be removed from an isntance.
   * Secondary vNIC
     * This can be in the same subnet, a different one, a whole different VCN. 
-    * It must be in the same availabily domain 
+    * It **must be in the same AD**
       * It cannot be in a subnet thats in a different availability domain
   * The number of vNICs that can be attached to an instance depends on the shape.
   * A vNIC must always be attached to an isntance.
@@ -137,7 +137,7 @@ A vNIC is a networking service in OCI that enables the communication from an ins
 * Every Instance has at least a primary. Can have more.
   * The vNICs on an instance could be connected to multiple subnets or even multiple VCNs.
     * This implies that the seclists and route tables on one VCN might not stop traffic to an instance which has an alternate network path through a second vNIC attachment
-  * Each vNIC has a primary private IP address, as well as upto 31 secondary private IP addresses. total=32
+  * Each vNIC has a primary private IP address, as well as upto 31 secondary private IP addresses. **total=32**
   * The primary private IP address is assigned at boot time and the secondary IP addresses are only assigned after launch.
   * A secondary private IP can be moved from one vNIC to antother
     * Helpful in failover. If one instance fails, the IP can be moved to another identical instance.
@@ -160,20 +160,19 @@ Public IPs are reachable from the internet and can be assigned to elements in a 
 
 ### Internet Gateway
 
-They provide a mechanism for public internet traffic to enter/exit a VCN.
-Without an Internet Gateway, a VCN is isolated from the internet even if it has a public IP.
-
- Is attached to a VCN, meaning its a regional construct
- There can be only one IG per VCN.
- A route needs to be defined in the route table for outbound traffic to target the IG.
+* They provide a mechanism for public internet traffic to enter/exit a VCN.
+* Without an Internet Gateway, a VCN is isolated from the internet even if it has a public IP.
+* Is attached to a VCN, meaning **its a regional construct**
+* There can be **only one IG per VCN**.
+* A route needs to be defined in the route table for outbound traffic to target the IG.
 
 ### Route Table
 
 A route table is a set of routing instuctions for network traffic in a VCN.
 
-* Each subnet has a single route table
+* Each **subnet has a single route table**
   * A single route table can be shared among many subnets and across ADs in the same region
-* Being attahed to a subnet makes the route table an AD scoped element.
+* Being attahed to a subnet makes the route table an **AD scoped** element.
 * A route rule is used when the destination address is outside the VCN's CIDR.
   * You can explicitly provide a Private IP as the target for a route rule for cases when you want to say direct internet traffic to a specific internal destination (like a firewall) that will then forward the request outward
 * No route rules are requrired when routing traffic within the VCN itself.
@@ -230,8 +229,12 @@ This also makes sure that the routes work even if the CIDRs change in the future
 
 A DRG is used to connect your VCN to your OnPrem network or to a remote VCN.
 
-* Its a standalone object, but has a 1:1 relationship with a VCN. A VCN can be attached to only one DRG at a time and vice versa
+* Its a standalone object, but has a **1:1 relationship with a VCN**. A VCN can be attached to only one DRG at a time and vice versa.
 * The DRG needs to reside in a compartment for access control reasons.
+* 3 Reasons to have a DRG
+  * CPE connectivity over IPSecVPN
+  * CPE connectivity over FastConnect (Private peering)
+  * Cross Region connectivity between to OCI regions (Remote Peering).
 * It can be atached to an VCN and detached from it any time
   * Attaching the DRG to an VCN creates an DRGAttachment object, and deleting this object detaches it.
 * Connects traffic from a private subnet to destinations that are in the a remote network, that are not internet.
@@ -286,6 +289,21 @@ Oracle backbone network, instead of sending traffic over the internet.
   * Source vNIC-1 -> DRG-1 -> DRG-2-> Target vNIC-2
 * Specific IAM policies are required. There are requestor as well as acceptor policies
 * Common for cross-region replication scenarios
+
+>  #### Confusing Terms
+>    * **Private Peering**
+>      * Customer extending thier data center in to OCI.
+>      * Conncetion established through IPSecVPN or FastConnect
+>    * **Public Peering**
+>      * Customer is makign calls to OCI public services like Object Storage, over a dedicated private channel
+>      * Connection established through FastConnect
+>      * Does not require a DRG in OCI, since the connectivity is established with an OCI Managed public service
+>    * **Remote Peering**
+>      * Connectivity between VCNs in two OCI regions
+>      * Unrelated to scenarios involving customer's on-prem resources. 
+>    * **Local Peering**
+>      * Connectivity between two VCNs in the same region.
+>      * Unrelated to scenarios involving customer's on-prem resources.
 
 ### Transit Routing
 
